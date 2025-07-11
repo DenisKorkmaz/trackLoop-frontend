@@ -1,29 +1,25 @@
 <template>
-  <div>
-    <p>Willkommen, {{ user?.name }}!</p>
-    <UButton @click="handleLogout">Logout</UButton>
+  <div class="p-4">
+    <h1 class="text-2xl mb-4">Pomodoro-Daten:</h1>
+    <p> {{ data }}}</p>
   </div>
 </template>
-<script setup lang="ts">
-import { definePageMeta, useToast, useRouter } from '#imports'
-import { useAuth } from '~/composables/auth/useAuth'
 
+<script setup lang="ts">
 
 definePageMeta({
   middleware: ['sanctum:auth'],
 });
 
-const { logout, user } = useAuth()
-const toast  = useToast()
-const router = useRouter()
 
-async function handleLogout() {
-  try {
-    await logout()
-    toast.add({ title: 'Abgemeldet', color: 'success' })
-    await router.push('/login')
-  } catch (err: any) {
-    toast.add({ title: 'Logout fehlgeschlagen', color: 'error' })
-  }
-}
+import {useRuntimeConfig} from '#imports'
+
+const config = useRuntimeConfig()
+
+const {data} = await useFetch(`${config.public.baseUrl}/api/pomodoros`, {
+  credentials: 'include',
+  server: false
+})
+
+
 </script>
